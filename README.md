@@ -23,6 +23,9 @@ With those the script should run and create a local minikube environment for you
 
 ### Common Issues
 There are a couple of known problems that can occur.
-Issue | Cause | Resolution
----| --- | --- 
-[VM_DOES_NOT_EXIST] Error getting state for host: machine does not exist | Exiting the setup process while VBox is starting | ```minikube delete```
+
+| Issue | Cause | Resolution |
+|---| --- | --- |
+|[VM_DOES_NOT_EXIST] Error getting state for host: machine does not exist | Exiting the setup process while VBox is starting | ```minikube delete```|
+
+
