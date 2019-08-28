@@ -27,5 +27,7 @@ There are a couple of known problems that can occur.
 | Issue | Cause | Resolution |
 |---| --- | --- |
 |[VM_DOES_NOT_EXIST] Error getting state for host: machine does not exist | Exiting the setup process while VBox is starting | ```minikube delete``` then start again|
+|kubectl logs reports that service account can't access "services" in a namespace other than _default_ | In the UI we parameterised the namespace option, but didn't expose a way to change it without altering code | In kubernetes_discovery.kubernetes_config.py replace ```self.namespace = namespace``` with ```self.namespace = default``` |
+|peristence layer reports psql connection error | Missing credentials | Make sure that database username and password has been added to your environment
 
 
