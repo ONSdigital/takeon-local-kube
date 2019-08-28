@@ -5,7 +5,7 @@ usage="$(basename "$0") [-h][-d file] -- script to automatically create our micr
 where:
 	-h shows this help text
 	-d database yaml file"
-while getopts ":d:p:b:u:" opt; do
+while getopts ":d:p:b:u:r:" opt; do
   case $opt in
     d) db="$OPTARG"
     ;;
@@ -14,6 +14,8 @@ while getopts ":d:p:b:u:" opt; do
     b) bl="$OPTARG"
 	;;
     u) ui="$OPTARG"
+	;;
+    r) repo="$OPTARG"
 	;;
     \?) echo "Invalid option -$OPTARG"  >&2
 	exit 1 
