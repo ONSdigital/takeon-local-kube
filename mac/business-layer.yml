@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: business-layer
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: business-layer
+      labels:
+        app: business-layer
+    spec:
+      containers:
+      - name: business-layer
+        image: <DOCKER-ID>/takeon-dev-bl:v1
+        ports:
+        - containerPort: 8088

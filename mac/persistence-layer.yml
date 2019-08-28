@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: persistence-layer
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: persistence-layer
+      labels:
+        app: persistence-layer
+    spec:
+      containers:
+      - name: persistence-layer
+        env:
+          - name: DATASOURCE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: database-secret-config
+                key: datasource_username
+          - name: DATASOURCE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: database-secret-config
+                key: datasource_password
+          - name: DB_SERVER
+            value: <POSTGRES_POD_IP>
+          - name: DB_PORT
+            value: "5432"
+          - name: DB_NAME
+            value: validationdb
+        image: <DOCKER-ID>/takeon-dev-pl:v1
+        ports:
+        - containerPort: 8090
