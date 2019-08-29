@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ui-layer
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: ui-layer
+      labels:
+        app: ui-layer
+    spec:
+      containers:
+      - name: ui-layer
+        image: <DOCKER-ID>/takeon-dev-ui:v1
+        ports:
+        - containerPort: 5000
