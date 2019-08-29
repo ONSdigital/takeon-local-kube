@@ -39,16 +39,61 @@ docker build -t takeon-dev-bl $bl
 docker build -t takeon-dev-ui $ui
 
 # Add service account
+
+kubectl create serviceaccount api-service-account
+
 cat << EOF | kubectl apply -f -
+apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  namespace: default
-  name: service-reader
+  name: api-access
 rules:
-- apiGroups: [""] # "" indicates the core API group
-  resources: ["services"]
-  verbs: ["get", "watch", "list"]
+  -
+    apiGroups:
+      - ""
+      - apps
+      - autoscaling
+      - batch
+      - extensions
+      - policy
+      - rbac.authorization.k8s.io
+    resources:
+      - componentstatuses
+      - configmaps
+      - daemonsets
+      - deployments
+      - events
+      - endpoints
+      - horizontalpodautoscalers
+      - ingress
+      - jobs
+      - limitranges
+      - namespaces
+      - nodes
+      - pods
+      - persistentvolumes
+      - persistentvolumeclaims
+      - resourcequotas
+      - replicasets
+      - replicationcontrollers
+      - serviceaccounts
+      - services
+    verbs: ["*"]
+  - nonResourceURLs: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: api-access
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: api-access
+subjects:
+- kind: ServiceAccount
+  name: api-service-account
+  namespace: default
 EOF
 
 # Create persistence service
@@ -134,6 +179,7 @@ spec:
       labels:
         app: ui-layer
     spec:
+      serviceAccountName: api-
       containers:
       - name: ui-layer
         image: takeon-dev-ui
