@@ -29,24 +29,26 @@ echo $ui
 # Start minikube context
 
 minikube start
+kubectl create namespace take-on
 eval $(minikube docker-env)
 
 kubectl create -f $db
 
-export DB_SERVER=$(kubectl get pods -o wide | grep "postgres" | awk '{ print $6 }')
+export DB_SERVER=$(kubectl get pods -o wide -n take-on | grep "postgres" | awk '{ print $6 }')
 docker build -t takeon-dev-pl $pl
 docker build -t takeon-dev-bl $bl
 docker build -t takeon-dev-ui $ui
 
 # Add service account
 
-kubectl create serviceaccount api-service-account
+kubectl create serviceaccount api-service-account -n take-on
 
 cat << EOF | kubectl apply -f -
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: api-access
+  namespace: take-on
 rules:
   -
     apiGroups:
@@ -58,25 +60,6 @@ rules:
       - policy
       - rbac.authorization.k8s.io
     resources:
-      - componentstatuses
-      - configmaps
-      - daemonsets
-      - deployments
-      - events
-      - endpoints
-      - horizontalpodautoscalers
-      - ingress
-      - jobs
-      - limitranges
-      - namespaces
-      - nodes
-      - pods
-      - persistentvolumes
-      - persistentvolumeclaims
-      - resourcequotas
-      - replicasets
-      - replicationcontrollers
-      - serviceaccounts
       - services
     verbs: ["*"]
   - nonResourceURLs: ["*"]
@@ -86,6 +69,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
   name: api-access
+  namespace: take-on
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -93,7 +77,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: api-service-account
-  namespace: default
+  namespace: take-on
 EOF
 
 # Create persistence service
@@ -103,7 +87,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: persistence-layer
-  namespace: default
+  namespace: take-on
 spec:
   replicas: 1
   template:
@@ -112,6 +96,7 @@ spec:
       labels:
         app: persistence-layer
     spec:
+      serviceAccountName: api-service-account
       containers:
       - name: persistence-layer
         env:
@@ -137,7 +122,7 @@ spec:
         - containerPort: 8090
 EOF
 
-kubectl expose deployment persistence-layer --type=LoadBalancer
+kubectl expose deployment persistence-layer --type=LoadBalancer -n take-on
 
 # Create business service
 cat <<EOF | kubectl apply -f -
@@ -145,7 +130,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: business-layer
-  namespace: default
+  namespace: take-on
 spec:
   replicas: 1
   template:
@@ -154,6 +139,7 @@ spec:
       labels:
         app: business-layer
     spec:
+      serviceAccountName: api-service-account
       containers:
       - name: business-layer
         image: takeon-dev-bl
@@ -162,7 +148,7 @@ spec:
         - containerPort: 8088
 EOF
 
-kubectl expose deployment business-layer --type=LoadBalancer
+kubectl expose deployment business-layer --type=LoadBalancer -n take-on
 
 # Create UI service
 cat <<EOF | kubectl apply -f -
@@ -170,7 +156,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: ui-layer
-  namespace: default
+  namespace: take-on
 spec:
   replicas: 1
   template:
@@ -179,7 +165,7 @@ spec:
       labels:
         app: ui-layer
     spec:
-      serviceAccountName: api-
+      serviceAccountName: api-service-account
       containers:
       - name: ui-layer
         image: takeon-dev-ui
@@ -188,8 +174,8 @@ spec:
         - containerPort: 5000
 EOF
 
-kubectl expose deployment ui-layer --type=LoadBalancer
+kubectl expose deployment ui-layer --type=LoadBalancer -n take-on
 
-URL=$(minikube service ui-layer --url)
+URL=$(minikube service ui-layer -n take-on --url)
 
 echo "UI URL: $URL"
