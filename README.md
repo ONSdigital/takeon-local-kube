@@ -33,8 +33,8 @@ There are a couple of known problems that can occur.
 ## Mac based systems
 This section gives the steps to create a local environment in Mac so that all the 3 layers of takeon project namely persistence-layer, business-layer and ui-layer can be run.
 ### Prerequisites
-It requires minikube. If minikube is not already installed, install minikube with brew cask install minikube. Please note before installation of minikube, VirtualBox should already be installed. VirtualBox can be installed with - brew cask reinstall virtualbox.
-The images of each layer should already be created locally from the respestive git repo against <Your docker id> with command ```docker build -t <Your docker id>/takeon-dev-pl:v1 .```
+It requires minikube. If minikube is not already installed, install minikube with ```brew cask install minikube```. Please note before installation of minikube, VirtualBox should already be installed. VirtualBox can be installed with - ```brew cask reinstall virtualbox```.
+The images of each layer should already be created locally from the respestive git repo against '<Your docker id>' with command ```docker build -t <Your docker id>/takeon-dev-pl:v1 .```
 ### Steps for first run
 1. Check if minikube is running with ```minikube status```. If it is not running run it with ```minikube start```. It can take more than a minute to start minikube.
 2. This step is required only in the first time run to grant access to service account so that it can access services from other pods. For this you can go to **mac** dir and run ```kubectl apply -f ../linux/service.yml```
