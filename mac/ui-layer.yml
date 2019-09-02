@@ -13,6 +13,6 @@ spec:
     spec:
       containers:
       - name: ui-layer
-        image: <DOCKER-ID>/takeon-dev-ui:v1
+        image: ${DOCKER_ID}/takeon-dev-ui:v1
         ports:
         - containerPort: 5000

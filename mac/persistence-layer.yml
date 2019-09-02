@@ -25,11 +25,11 @@ spec:
                 name: database-secret-config
                 key: datasource_password
           - name: DB_SERVER
-            value: <POSTGRES_POD_IP>
+            value: ${DB_SERVER_IP}
           - name: DB_PORT
             value: "5432"
           - name: DB_NAME
-            value: validationdb
-        image: <DOCKER-ID>/takeon-dev-pl:v1
+            value: ${DB_NAME}
+        image: ${DOCKER_ID}/takeon-dev-pl:v1
         ports:
         - containerPort: 8090
