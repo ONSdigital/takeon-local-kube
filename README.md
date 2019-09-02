@@ -48,8 +48,8 @@ In case of re run, you can delete the service and layers with './delete-layers.s
 You can refer to the Common Issues section under 'Linux based systems'. Also the following issue can occur -
 | Issue | Cause | Resolution |
 |---| --- | --- |
-|If you re start minikube, it can allocate a different ip address to the postgres pod. In that case the persistence layer will no longer be able to connect to postgres | allocation of different ip address to postgres pod by minikube re start | Follow the steps mentioned above for re run
-|UI layer not able to access other services | service account requires cluster-admin role | Along with step 2 above, the command 'kubectl create clusterrolebinding default-admin --clusterrole cluster-admin --serviceaccount=default:default' can work
+|If you re start minikube, it can allocate a different ip address to the postgres pod. In that case the persistence layer will no longer be able to connect to postgres | Allocation of different ip address to postgres pod by minikube restart | Follow the steps mentioned above for re run|
+|UI layer not able to access other services | Service account requires cluster-admin role | Along with step 2 above, the command 'kubectl create clusterrolebinding default-admin --clusterrole cluster-admin --serviceaccount=default:default' can work |
 
 ### logs
 Once the minikube is started, you can access the dashboard with 'minikube dashboard' command. Then going to pod section, you can view the logs.
