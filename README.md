@@ -45,7 +45,8 @@ It requires minikube. If minikube is not already installed, install minikube wit
 In case of re run, you can delete the service and layers with './delete-layers.sh' under mac dir. Then you can run './postgres.sh' and './layers.sh' under mac dir. Finally you can run './testdata/test-data.sh'. If you are not deleting the postgres deployment, the testdata will still be available from the previous run.
 
 ### Issues/Errors
-You can refer to the Common Issues section under 'Linux based systems'. Also the following issue can occur -
+You can refer to the Common Issues section under 'Linux based systems'. Also the following issues can occur.
+
 | Issue | Cause | Resolution |
 |---| --- | --- |
 |If you re start minikube, it can allocate a different ip address to the postgres pod. In that case the persistence layer will no longer be able to connect to postgres | Allocation of different ip address to postgres pod by minikube restart | Follow the steps mentioned above for re run|
