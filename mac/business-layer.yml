@@ -13,6 +13,6 @@ spec:
     spec:
       containers:
       - name: business-layer
-        image: <DOCKER-ID>/takeon-dev-bl:v1
+        image: ${DOCKER_ID}/takeon-dev-bl:v1
         ports:
         - containerPort: 8088

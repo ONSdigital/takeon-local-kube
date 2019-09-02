@@ -1,0 +1,4 @@
+export DOCKER_ID=<Your docker id>
+export SECRET_OF_DB_USERNAME=<Replace with the secret of postgres username>
+export SECRET_OF_DB_PASSWORD=<Replace with the secret of postgres password>
+export DB_NAME=<Replace with the database name>
