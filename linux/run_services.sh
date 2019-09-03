@@ -1,11 +1,6 @@
 #! /bin/bash
 
-usage="$(basename "$0") [-h][-d file] -- script to automatically create our microservices locally
-
-where:
-	-h shows this help text
-	-d database yaml file"
-while getopts ":d:p:b:u:r:x:y:" opt; do
+while getopts ":d:p:b:u:r:" opt; do
   case $opt in
     d) db="$OPTARG"
     ;;
@@ -16,10 +11,6 @@ while getopts ":d:p:b:u:r:x:y:" opt; do
     u) ui="$OPTARG"
 	  ;;
     r) repo="$OPTARG"
-	  ;;
-    x) username="$OPTARG"
-    ;;
-    y) password="$OPTARG"
     ;;
     \?) echo "Invalid option -$OPTARG"  >&2
 	exit 1 
@@ -30,87 +21,34 @@ echo $db
 echo $pl
 echo $bl
 echo $ui
-echo $username
-echo $password
+
+# create database username and password
+username=$(python3 -c 'import gen_words as g; g.gen_name()')
+password=$(python3 -c 'import gen_words as g; g.gen_pass()')
+
 # Start minikube context
 
 minikube start
 kubectl create namespace take-on
 eval $(minikube docker-env)
 
-# kubectl create -f $db
+# Create entry script for database
 
-cat << EOF | kubectl apply -f -
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: database-credentials
-  namespace: take-on
-data:
-  datasource_username: $username
-  datasource_password: $password
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: postgres-pv-claim
-  namespace: take-on
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 32Gi
----
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: postgres
-  namespace: take-on
-spec:
-  template:
-    metadata:
-      labels:
-        app: postgres
-    spec:
-      volumes:
-        - name: postgres-storage
-          persistentVolumeClaim:
-            claimName: postgres-pv-claim
-      containers:
-        - image: postgres
-          name: postgres
-          env:
-            - name: DATASOURCE_USERNAME
-              valueFrom:
-                configMapKeyRef:
-                  name: database-credentials
-                  key: datasource_username
-            - name: DATASOURCE_PASSWORD
-              valueFrom:
-                configMapKeyRef:
-                  name: database-credentials
-                  key: datasource_password
-            - name: POSTGRES_DB
-              value: validationdb
-            - name: PGDATA
-              value: /var/lib/postgresql/data/pgdata
-          ports:
-            - containerPort: 5432
-              name: postgres
-          volumeMounts:
-            - name: postgres-storage
-              mountPath: /var/lib/postgresql/data
-EOF
-echo "Waiting for DB to start"
-sleep 90s
-export DB_SERVER=$(kubectl get pods -o wide -n take-on | grep "postgres" | awk '{ print $6 }')
-echo $DB_SERVER
+echo "psql -f /takeon-db/tables.sql
+psql -d validationdb -c \"CREATE USER $username WITH PASSWORD $password;\"
+psql -d validationdb -c \"GRANT USAGE ON SCHEMA dev01 TO $username;\"
+psql -d validationdb -c \"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA dev01 TO $username;\"
+psql -f /takeon-db/edge_case.sql;" > ../postgres/entry.sh
+# Build images
+echo ""
+echo "##### BUILDING DOCKER IMAGES #####"
+echo ""
+docker build -t takeon-dev-postgres $db
 docker build -t takeon-dev-pl $pl
 docker build -t takeon-dev-bl $bl
 docker build -t takeon-dev-ui $ui
 
-
+echo "Images built"
 # Add service account
 
 kubectl create serviceaccount api-service-account -n take-on
@@ -146,6 +84,43 @@ subjects:
   namespace: take-on
 EOF
 
+# Create database
+
+cat <<EOF | kubectl apply -f -
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: database-service
+  namespace: take-on
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: database-service
+      labels:
+        app: database-service
+    spec:
+      serviceAccountName: api-service-account
+      containers:
+      - name: database-service
+        image: takeon-dev-postgres
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5432
+EOF
+
+echo "Waiting for DB to start"
+sleep 30s
+export DB_SERVER=$(kubectl get pods -o wide -n take-on | grep "database" | awk '{ print $6 }')
+echo $DB_SERVER
+echo ""
+echo ""
+echo "The database should now be running please run the following:"
+echo "kubectl exec -it $(kubectl get pods -o wide -n take-on | grep "database" | awk '{ print $1 }') /bin/ash -n take-on"
+echo "./entry.sh"
+sleep 20s
+echo ""
+echo ""
 # Create persistence service
 
 cat << EOF | kubectl apply -f -

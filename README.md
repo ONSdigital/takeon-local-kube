@@ -11,18 +11,28 @@ sudo chmod +x run_services.sh
 ```
 Once that has been changed run the script by doing
 ```bash
-./run_services.sh -d [path] -p [path] -u [path] -b [path] -x [user] -p [passwod]
+./run_services.sh -d [path] -p [path] -u [path] -b [path]
 ```
 The 6 command line arguments are:
-* **-d**: Path to the postgres.yml file
+* **-d**: Path to the directory containing the postgres Dockerfile
 * **-p**: Path to the directory containing the persistence layer Dockerfile
 * **-u**: Path to the directory containing the ui layer Dockerfile
 * **-b**: Path to the directory containing the business layer Dockerfile
-* **-x**: Database username
-* **-y**: Database password
 
 With those the script should run and create a local minikube environment for you to play with.
 
+### Manual Parts
+Unfortunately there is one part of this whole process that needs manual input, that is, the running of the entry script. To do this, we need to ssh into the container and run the script that's already there. Some instructions are provided in the script, but we give a small overview here.
+```bash
+kubectl exec -it POD-NAME /bin/ash -n take-on
+```
+This will allow us to run an interactive shell session in the database container, the ```POD-NAME``` part is genereated at runtime, and will be given in the terminal, in the shell session we just created run the following:
+```bash
+./entry.sh USERNAME PASSWORD
+```
+This runs our shell script passing in the username and password for the database. Both of these are generated at run time and will be provided by the run_services script.
+
+This section really shouldn't exist, but I'm having trouble running the entrypoint script directly from the docker file, for the life of me I can't work out why.
 ### Common Issues
 There are a couple of known problems that can occur.
 
