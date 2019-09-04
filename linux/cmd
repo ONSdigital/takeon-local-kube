@@ -1,1 +1,1 @@
-./run_services.sh -p ~/Documents/project-repos/takeon/takeon-persistence-layer/ -d ~/Downloads/postgres.yml -b ~/Documents/project-repos/takeon/takeon-business-layer/ -u ~/Documents/project-repos/takeon/takeon-ui/
+./run_services.sh -p ~/Documents/project-repos/takeon/takeon-persistence-layer/ -d ../postgres -b ~/Documents/project-repos/takeon/takeon-business-layer/ -u ~/Documents/project-repos/takeon/takeon-ui/

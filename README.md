@@ -13,7 +13,7 @@ Once that has been changed run the script by doing
 ```bash
 ./run_services.sh -d [path] -p [path] -u [path] -b [path]
 ```
-The 6 command line arguments are:
+The 4 command line arguments are:
 * **-d**: Path to the directory containing the postgres Dockerfile
 * **-p**: Path to the directory containing the persistence layer Dockerfile
 * **-u**: Path to the directory containing the ui layer Dockerfile
