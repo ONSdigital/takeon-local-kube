@@ -65,6 +65,7 @@ rules:
       - ""
     resources:
       - services
+      - endpoints
     verbs: ["*"]
   - nonResourceURLs: ["*"]
     verbs: ["*"]
@@ -114,12 +115,10 @@ sleep 30s
 export DB_SERVER=$(kubectl get pods -o wide -n take-on | grep "database" | awk '{ print $6 }')
 echo $DB_SERVER
 echo ""
-echo ""
 echo "The database should now be running please run the following:"
 echo "kubectl exec -it $(kubectl get pods -o wide -n take-on | grep "database" | awk '{ print $1 }') /bin/ash -n take-on"
 echo "./entry.sh"
 sleep 20s
-echo ""
 echo ""
 # Create persistence service
 
