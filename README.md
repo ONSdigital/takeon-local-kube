@@ -28,7 +28,7 @@ kubectl exec -it POD-NAME /bin/ash -n take-on
 ```
 This will allow us to run an interactive shell session in the database container, the ```POD-NAME``` part is genereated at runtime, and will be given in the terminal, in the shell session we just created run the following:
 ```bash
-./entry.sh USERNAME PASSWORD
+./entry.sh
 ```
 This runs our shell script passing in the username and password for the database. Both of these are generated at run time and will be provided by the run_services script.
 
