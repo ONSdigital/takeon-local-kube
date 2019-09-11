@@ -431,3 +431,4 @@ Values
 ( 41, 'Default', 'Default', 'question', '1000', 'response', 0, current_user, now() ),                --# Q1001 (cp) vs Q1001 (pp) with threshold of 0
 ( 41, 'Default', 'Default', 'comparison_question', '1000', 'response', 1, current_user, now() ),
 ( 41, 'Default', 'Default', 'threshold', '0', '', 0, current_user, now() );
+
