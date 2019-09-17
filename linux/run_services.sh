@@ -128,8 +128,10 @@ echo "kubectl exec -it $(kubectl get pods -o wide -n take-on | grep "database" |
 echo "./entry.sh"
 sleep 20s
 echo ""
-
-
+### GET DATABASE LOCATION FOR GRAPHQL ###
+kubectl expose deployment database-service --type=LoadBalancer -n take-on
+location=$(kubectl get service -n take-on | grep database | awk '{ print $3 }')
+echo "DATABASE LOCATION: $location"
 # Create persistence service
 cat << EOF | kubectl apply -f -
 apiVersion: extensions/v1beta1
@@ -191,28 +193,28 @@ spec:
       - name: graphql
         image: graphql
         imagePullPolicy: Never
-        args: ['--connection', 'postgres://takeonadmin:aVerySecurePassword123!@validationdb.cyjaepzpx1tk.eu-west-2.rds.amazonaws.com/validationdb', '--schema', 'dev01', '-j', '-a', '--watch']
+        args: ['--connection', 'postgres://$username:$password@$location/validationdb', '--schema', 'dev01', '-j', '-a', '--watch']
         ports:
         - containerPort: 5000
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: graphql
-  namespace: take-on
-  labels:
-    app: graphql
-spec:
-  ports:
-  - port: 5001
-    targetPort: 5000
-    protocol: TCP
-  selector:
-    app: graphql
-  type: ClusterIP
-
 EOF
+kubectl expose deployment graphql --type=LoadBalancer -n take-on
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: graphql
+#   namespace: take-on
+#   labels:
+#     app: graphql
+# spec:
+#   ports:
+#   - port: 5001
+#     targetPort: 5000
+#     protocol: TCP
+#   selector:
+#     app: graphql
+#   type: ClusterIP
+
 
 
 # Create business service
