@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${DB_service}
+  namespace: ${namespace}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ${DB_service}
+  template:
+    metadata:
+      name: ${DB_service}
+      labels:
+        name: ${DB_service}
+        app: ${DB_service}
+    spec:
+      serviceAccountName: api-service-account
+      containers:
+      - name: ${DB_service}
+        image: ${DB_image}
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: database-secret-config
+                key: datasource_username
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: database-secret-config
+                key: datasource_password
+          - name: POSTGRES_DB
+            value: ${DB_name}
+        ports:
+        - containerPort: 5432

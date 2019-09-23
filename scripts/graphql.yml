@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${QL_service}
+  namespace: ${namespace}
+  labels:
+    app: ${QL_service}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${QL_service}
+  template:
+    metadata:
+      labels:
+        app: ${QL_service}
+    spec:
+      serviceAccountName: api-service-account
+      containers:
+      - name: ${QL_service}
+        image: ${QL_image}
+        imagePullPolicy: Never
+        args: ['--connection', 'postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_SERVER_IP}/${DB_name}', '--schema', 'dev01', '-j', '-a', '--watch']
+        ports:
+        - containerPort: 5000

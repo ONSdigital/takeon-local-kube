@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: persistence-layer
+  namespace: ${namespace}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: persistence-layer
+  template:
+    metadata:
+      name: persistence-layer
+      labels:
+        name: persistence-layer
+        app: persistence-layer
+    spec:
+      serviceAccountName: api-service-account
+      containers:
+      - name: persistence-layer
+        image: ${PL_image} 
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: DATASOURCE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: database-secret-config
+                key: datasource_username
+          - name: DATASOURCE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: database-secret-config
+                key: datasource_password
+          - name: DB_SERVER
+            value: ${DB_SERVER_IP}
+          - name: DB_PORT
+            value: "5432"
+          - name: DB_NAME
+            value: ${DB_name}
+        ports:
+        - containerPort: 8090
