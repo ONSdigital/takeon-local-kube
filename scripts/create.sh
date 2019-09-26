@@ -5,10 +5,10 @@
 
 ./init.sh
 ./postgres.sh
-./graphql.sh &
-./persistence.sh &
-./business.sh &
-./ui.sh &
+./graphql.sh 
+./persistence.sh 
+./business.sh 
+./ui.sh 
 
 wait
 echo
