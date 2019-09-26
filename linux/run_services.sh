@@ -1,6 +1,6 @@
 #! /bin/bash
 
-while getopts ":d:p:b:u:r:" opt; do
+while getopts ":d:p:b:u:q:r:" opt; do
   case $opt in
     d) db="$OPTARG"
     ;;
@@ -9,6 +9,8 @@ while getopts ":d:p:b:u:r:" opt; do
     b) bl="$OPTARG"
 	  ;;
     u) ui="$OPTARG"
+	  ;;
+    q) ql="$OPTARG"
 	  ;;
     r) repo="$OPTARG"
     ;;
@@ -21,6 +23,7 @@ echo $db
 echo $pl
 echo $bl
 echo $ui
+echo $ql
 
 # create database username and password
 username=$(python3 -c 'import gen_words as g; g.gen_name()')
@@ -39,6 +42,10 @@ psql -d validationdb -c \"CREATE USER $username WITH PASSWORD '$password';\"
 psql -d validationdb -c \"GRANT USAGE ON SCHEMA dev01 TO $username;\"
 psql -d validationdb -c \"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA dev01 TO $username;\"
 psql -f /takeon-db/edge_cases.sql;" > ../postgres/entry.sh
+
+echo "Get postgraphile dockerfile"
+curl https://raw.githubusercontent.com/graphile/postgraphile/master/Dockerfile > dockerfile
+
 # Build images
 echo ""
 echo "##### BUILDING DOCKER IMAGES #####"
@@ -47,7 +54,8 @@ docker build -t takeon-dev-postgres $db
 docker build -t takeon-dev-pl $pl
 docker build -t takeon-dev-bl $bl
 docker build -t takeon-dev-ui $ui
-
+docker pull graphile/postgraphile 
+docker tag graphile/postgraphile graphql
 echo "Images built"
 # Add service account
 
@@ -120,8 +128,11 @@ echo "kubectl exec -it $(kubectl get pods -o wide -n take-on | grep "database" |
 echo "./entry.sh"
 sleep 20s
 echo ""
+### GET DATABASE LOCATION FOR GRAPHQL ###
+kubectl expose deployment database-service --type=LoadBalancer -n take-on
+location=$(kubectl get service -n take-on | grep database | awk '{ print $3 }')
+echo "DATABASE LOCATION: $location"
 # Create persistence service
-
 cat << EOF | kubectl apply -f -
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -157,6 +168,54 @@ spec:
 EOF
 
 kubectl expose deployment persistence-layer --type=LoadBalancer -n take-on
+
+
+cat << EOF | kubectl apply -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graphql
+  namespace: take-on
+  labels:
+    app: graphql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: graphql
+  template:
+    metadata:
+      labels:
+        app: graphql
+    spec:
+      serviceAccountName: api-service-account
+      containers:
+      - name: graphql
+        image: graphql
+        imagePullPolicy: Never
+        args: ['--connection', 'postgres://$username:$password@$location/validationdb', '--schema', 'dev01', '-j', '-a', '--watch']
+        ports:
+        - containerPort: 5000
+EOF
+kubectl expose deployment graphql --type=LoadBalancer -n take-on
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: graphql
+#   namespace: take-on
+#   labels:
+#     app: graphql
+# spec:
+#   ports:
+#   - port: 5001
+#     targetPort: 5000
+#     protocol: TCP
+#   selector:
+#     app: graphql
+#   type: ClusterIP
+
+
 
 # Create business service
 cat <<EOF | kubectl apply -f -

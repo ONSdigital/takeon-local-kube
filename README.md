@@ -39,6 +39,7 @@ There are a couple of known problems that can occur.
 | Issue | Cause | Resolution |
 |---| --- | --- |
 |[VM_DOES_NOT_EXIST] Error getting state for host: machine does not exist | Exiting the setup process while VBox is starting | ```minikube delete``` then start again|
+|GraphQL says "No role exists for ```<LETTERS>```" | The entry script in the database layer wasn't run | Run the entry script, after you will likely need to restart the GraphQL service. Run ```kubectl delete <graph-ql-pod-name> -n take-on``` a new pod should start immediately|
 
 ## Mac based systems
 This section gives the steps to create a local environment in Mac so that all the 3 layers of takeon project namely persistence-layer, business-layer and ui-layer can be run.

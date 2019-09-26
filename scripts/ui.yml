@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui-layer
+  namespace: ${namespace}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ui-layer
+  template:
+    metadata:
+      name: ui-layer
+      labels:
+        name: ui-layer
+        app: ui-layer
+    spec:
+      serviceAccountName: api-service-account
+      containers:
+      - name: ui-layer
+        image: ${UI_image}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000

@@ -88,7 +88,7 @@ Create Table dev01.Contributor
     Turnover                    Decimal(13,0) Not Null,
     EnterpriseReference         Char(10) Not Null,
     WowEnterpriseReference      Varchar(10) Not Null,
-    CellNumber                  SmallInt Not Null,
+    CellNumber                  Varchar(6) Not Null,
     Currency                    Char(1) Not Null,
     VatReference                Varchar(12) Not Null,
     PayeReference               Varchar(13) Not Null,

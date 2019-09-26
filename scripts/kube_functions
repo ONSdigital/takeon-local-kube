@@ -1,0 +1,40 @@
+#! /bin/bash
+
+log() {
+  date +"%T $*"
+}
+
+
+delete_deployment() {
+  # $1 = namespace
+  # $2 = deployment/service
+  DEPLOYMENT=$(kubectl get deployment -n $1 -o wide | grep "$2" | awk '{ print $1 }')
+  if [ ! -z ${DEPLOYMENT} ]
+  then
+    log "Removing deployment ${DEPLOYMENT} in namespace $1"
+    kubectl delete deployment ${DEPLOYMENT} -n $1
+    sleep 5
+  fi
+}
+
+
+delete_service() {
+  # $1 = namespace
+  # $2 = deployment/service
+  SERVICE=$(kubectl get service -n $1 -o wide | grep "$2" | awk '{ print $1 }')
+  if [ ! -z ${DEPLOYMENT} ]
+  then
+    log "Removing service ${SERVICE} in namespace $1"
+    kubectl delete service ${SERVICE} -n $1
+    sleep 5
+  fi
+}
+
+
+apply() {
+  # $1 = yml file
+  log "Applying $1"
+  source /tmp/minikube_env
+  cat $1 | envsubst | kubectl apply -f -
+  sleep 1
+}
