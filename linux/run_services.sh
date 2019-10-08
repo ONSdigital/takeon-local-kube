@@ -51,11 +51,12 @@ echo ""
 echo "##### BUILDING DOCKER IMAGES #####"
 echo ""
 docker build -t takeon-dev-postgres $db
-docker build -t takeon-dev-pl $pl
-docker build -t takeon-dev-bl $bl
+docker build -t takeon-dev-pl $pl 
+docker build -t takeon-dev-bl $bl 
 docker build -t takeon-dev-ui $ui
 docker pull graphile/postgraphile 
 docker tag graphile/postgraphile graphql
+wait
 echo "Images built"
 # Add service account
 

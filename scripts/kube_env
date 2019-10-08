@@ -1,4 +1,4 @@
-export basedir=/Users/david/repo
+export basedir=/home/ryan/Documents/project-repos/takeon
 export logdir=${basedir}/takeon-local-kube/logs
 
 export namespace=take-on

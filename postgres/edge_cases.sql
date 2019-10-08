@@ -433,3 +433,8 @@ Values
 ( 41, 'Default', 'Default', 'comparison_question', '1000', 'response', 1, current_user, now() ),
 ( 41, 'Default', 'Default', 'threshold', '0', '', 0, current_user, now() );
 
+
+insert into dev01.validationoutput (reference, period, survey, validationid, instance, primaryvalue, formula, createdby, createddate) values ('12345678001', '201801', '999A', 10, 1, 19, '19 != ""', 'postgres', now());
+
+insert into dev01.validationoutput (reference, period, survey, validationid, instance, primaryvalue, formula, createdby, createddate) values ('12345678001', '201801', '999A', 10, 1, 21, '21 != ""', 'postgres', now());
+
