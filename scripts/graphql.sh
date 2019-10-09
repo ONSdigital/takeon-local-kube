@@ -12,7 +12,6 @@ delete_deployment ${namespace} ${QL_image}
 delete_service ${namespace} ${QL_image}
 
 log "Get postgraphile dockerfile"
-curl https://raw.githubusercontent.com/graphile/postgraphile/master/Dockerfile > dockerfile
 docker pull graphile/postgraphile 
 docker tag graphile/postgraphile ${QL_image}
 
