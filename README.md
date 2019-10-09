@@ -86,24 +86,26 @@ Wrapper script around the entire (re)creation process. A single command which wi
 ## Issues / Awareness
 
 If the scripts are not executable after downloading then you will need to use chmod as appropriate.
+
 The process will build images from the above code using whichever branch you have checked out.
+
 A persistent volume is not being used. All data within the local postgres database is therefore transitory! Any changes will be lost when the container is refreshed!
 
 ## Useful commands
 
-Run an interactive shell session in a pod - ```kubectl exec -it POD-NAME /bin/ash -n take-on```
-Current runtime status of minikube - ```minikube status```
-Reset everything - ```minikube delete``` followed by ```minikube start```
-Access the minikube dashboard - ```minikube dashboard```
-View all the available pods - ```kubectl get pods -ntake-on```
-View all IP & ports for deployed layers - ```minikube service list -ntake-on```
-View container logs - ```kubectl logs <PODNAME> -ntake-on```
+* Run an interactive shell session in a pod - ```kubectl exec -it POD-NAME /bin/ash -n take-on```
+* Current runtime status of minikube - ```minikube status```
+* Reset everything - ```minikube delete``` followed by ```minikube start```
+* Access the minikube dashboard - ```minikube dashboard```
+* View all the available pods - ```kubectl get pods -ntake-on```
+* View all IP & ports for deployed layers - ```minikube service list -ntake-on```
+* View container logs - ```kubectl logs <PODNAME> -ntake-on```
 
 ## Recommended aliases/functions
 
-alias kubeurl='minikube service list -ntake-on'
-alias allpods='kubectl get pods -ntake-on'
-kubelogs(){
+* alias kubeurl='minikube service list -ntake-on'
+* alias allpods='kubectl get pods -ntake-on'
+* kubelogs(){
   kubectl logs $(kubectl get pods -ntake-on | grep "$1" | awk '{print $1}') -ntake-on
 }
 
@@ -120,4 +122,3 @@ You can refer to the Common Issues section under 'Linux based systems'. Also the
 |---| --- | --- |
 |If you re start minikube, it can allocate a different ip address to the postgres pod. In that case the persistence layer will no longer be able to connect to postgres | Allocation of different ip address to postgres pod by minikube restart | Follow the steps mentioned above for re run|
 |UI layer not able to access other services | Service account requires cluster-admin role | Along with step 2 above, the command ```kubectl create clusterrolebinding default-admin --clusterrole cluster-admin --serviceaccount=default:default``` can work |
-
