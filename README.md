@@ -114,6 +114,7 @@ kubelogs will look up the appropriate internal pod details and let you view a lo
 * ```kubelogs ql```
 
 ### Issues/Errors
+
 You can refer to the Common Issues section under 'Linux based systems'. Also the following issues can occur.
 
 | Issue | Cause | Resolution |
