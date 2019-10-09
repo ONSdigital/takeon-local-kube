@@ -103,17 +103,15 @@ A persistent volume is not being used. All data within the local postgres databa
 
 ## Recommended aliases/functions
 
-* alias kubeurl='minikube service list -ntake-on'
-* alias allpods='kubectl get pods -ntake-on'
-* kubelogs(){
-  kubectl logs $(kubectl get pods -ntake-on | grep "$1" | awk '{print $1}') -ntake-on
-}
+* ```alias kubeurl='minikube service list -ntake-on'```
+* ```alias allpods='kubectl get pods -ntake-on'```
+* ```kubelogs(){ kubectl logs $(kubectl get pods -ntake-on | grep "$1" | awk '{print $1}') -ntake-on}```
 
 kubelogs will look up the appropriate internal pod details and let you view a log by using a unique part of the layer title. i.e.
 
-* kubelogs ui
-* kubelogs bus
-* kubelogs ql
+* ```kubelogs ui```
+* ```kubelogs bus```
+* ```kubelogs ql```
 
 ### Issues/Errors
 You can refer to the Common Issues section under 'Linux based systems'. Also the following issues can occur.
