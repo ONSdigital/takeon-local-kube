@@ -1,5 +1,26 @@
-# takeon-local-kube
+# Guide
+
 Running the takeon UI & associated services locally using minikube
+
+## Pre-requisites
+
+Getting the services up and running requires pre-installing some software
+
+We make use of envsubst in our scripts, so if you don't have it installed it comes with gettext:
+
+```bash
+brew install gettext
+brew link --force gettext
+```
+
+We also require local kubernetes software. Initially we are using:
+
+```bash
+brew cask install minikube
+```
+
+## Setting up git repositories
+
 
 
 
