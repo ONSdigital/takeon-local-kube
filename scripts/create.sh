@@ -1,5 +1,10 @@
 #! /bin/bash
 
+echo
+echo "(Re)creating all containers and deploying to a local minikube installation"
+echo
+
+
 #minikube delete
 #minikube start
 
