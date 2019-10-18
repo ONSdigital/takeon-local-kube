@@ -1,6 +1,5 @@
 SET search_path TO dev01,public;
 
-
 drop table dev01.ValidationOutput;
 drop table dev01.ValidationParameter;
 drop table dev01.ValidationAttribute;
@@ -82,7 +81,7 @@ Create Table dev01.Contributor
     Period                      Char(6) Not Null,
     Survey                      Char(4) References Survey(Survey),
     FormID                      Integer References Form(FormID),
-    Status                      Varchar(20) Not Null,
+    Status                      Varchar(32) Not Null,
     ReceiptDate                 timestamptz,
     LockedBy                    Varchar(16),
     LockedDate                  timestamptz,
@@ -230,8 +229,8 @@ Create Table dev01.ValidationOutput
     Survey              Char(6) References Survey(Survey),
     ValidationID        BigInt References ValidationForm(ValidationID),
     Instance            BigInt Not Null,
-    PrimaryValue        Varchar(128) Not Null,
     Formula             Varchar(128) Not Null,
+    Triggered           Boolean Not Null,
     CreatedBy           Varchar(16) Not Null,
     CreatedDate         timestamptz Not Null,
     LastUpdatedBy       Varchar(16),
@@ -239,6 +238,49 @@ Create Table dev01.ValidationOutput
     Foreign Key (Reference, Period, Survey) References Contributor (Reference, Period, Survey)
 );
 Create Index idx_validationoutput_referenceperiodsurvey On ValidationOutput(Reference, Period, Survey);
+
+Create Or Replace Function dev01.deleteOutput(reference text, period text, survey text) 
+Returns void As $$
+
+    Delete
+    From    dev01.validationoutput
+    Where   reference = $1 
+    And     period = $2
+    And     survey = $3
+
+$$ language sql VOLATILE;
+
+
+Create Function dev01.InsertValidationOutputByArray(dev01.validationoutput[])
+Returns dev01.validationoutput as $$
+
+    Insert Into dev01.validationoutput 
+    (
+        reference,
+        period, 
+        survey, 
+        validationid,
+        instance, 
+        triggered, 
+        formula, 
+        createdBy, 
+        createdDate
+    )
+    Select  reference,
+            period, 
+            survey, 
+            validationid, 
+            instance, 
+            triggered, 
+            formula, 
+            createdBy, 
+            createdDate
+    From    unnest($1)
+    Returning *;
+
+$$ LANGUAGE sql VOLATILE STRICT SECURITY DEFINER;
+
+
 
 Insert Into dev01.Survey
 (
