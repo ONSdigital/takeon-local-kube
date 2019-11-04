@@ -239,12 +239,12 @@ Create Table dev01.ValidationOutput
 );
 Create Index idx_validationoutput_referenceperiodsurvey On ValidationOutput(Reference, Period, Survey);
 
-Create Or Replace Function dev01.deleteOutput(reference text, period text, survey text) 
+Create Or Replace Function dev01.deleteOutput(reference text, period text, survey text)
 Returns void As $$
 
     Delete
     From    dev01.validationoutput
-    Where   reference = $1 
+    Where   reference = $1
     And     period = $2
     And     survey = $3
 
@@ -254,26 +254,26 @@ $$ language sql VOLATILE;
 Create Function dev01.InsertValidationOutputByArray(dev01.validationoutput[])
 Returns dev01.validationoutput as $$
 
-    Insert Into dev01.validationoutput 
+    Insert Into dev01.validationoutput
     (
         reference,
-        period, 
-        survey, 
+        period,
+        survey,
         validationid,
-        instance, 
-        triggered, 
-        formula, 
-        createdBy, 
+        instance,
+        triggered,
+        formula,
+        createdBy,
         createdDate
     )
     Select  reference,
-            period, 
-            survey, 
-            validationid, 
-            instance, 
-            triggered, 
-            formula, 
-            createdBy, 
+            period,
+            survey,
+            validationid,
+            instance,
+            triggered,
+            formula,
+            createdBy,
             createdDate
     From    unnest($1)
     Returning *;
@@ -561,9 +561,9 @@ Insert Into dev01.ValidationRule
     CreatedDate
 )
 Values
-( 'VP','Value Present','question != ""',current_user,now()),
+( 'VP','Value Present','"question" != ""',current_user,now()),
 ( 'POPM','Period on Period Movement','abs(question - comparison_question) > threshold AND question > 0 AND comparison_question > 0',current_user,now()),
-( 'POPZC','Period on Period Zero Continuity','question != comparison_question AND ( question = 0 OR comparison_question = 0 ) AND abs(question - comparison_question) > Threshold',current_user,now()),
+( 'POPZC','Period on Period Zero Continuity','question != comparison_question AND ( question = 0 OR comparison_question = 0 ) AND abs(question - comparison_question) > threshold',current_user,now()),
 ( 'QVDQ','Question vs Derived Question','question != comparison_question',current_user,now());
 
 
