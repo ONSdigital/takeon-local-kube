@@ -280,7 +280,7 @@ Returns dev01.validationoutput as $$
 
 $$ LANGUAGE sql VOLATILE STRICT SECURITY DEFINER;
 
-Create Or Replace Function dev01.saveresponsearray(dev01.response[])
+Create Or Replace Function dev01.SaveResponseArray(dev01.response[])
 Returns dev01.response as $$
     Insert into dev01.response
     (
