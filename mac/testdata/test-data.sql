@@ -280,6 +280,42 @@ Returns dev01.validationoutput as $$
 
 $$ LANGUAGE sql VOLATILE STRICT SECURITY DEFINER;
 
+Create Or Replace Function dev01.SaveResponseArray(dev01.response[])
+Returns dev01.response as $$
+    Insert into dev01.response
+    (
+        reference,
+        period, 
+        survey, 
+        questionCode, 
+        instance, 
+        response, 
+        createdBy, 
+        createdDate,
+        lastUpdatedBy,
+        lastUpdatedDate
+    ) 
+    Select  reference,
+            period, 
+            survey, 
+            questionCode, 
+            instance, 
+            response, 
+            createdBy, 
+            createdDate,
+            lastUpdatedBy,
+            lastUpdatedDate
+    From    UnNest($1)    
+    On Conflict On Constraint response_pkey Do
+    Update Set
+        response = EXCLUDED.response,
+        lastUpdatedBy = EXCLUDED.lastUpdatedBy,
+        lastUpdatedDate = EXCLUDED.lastUpdatedDate
+    Returning *;
+
+$$ LANGUAGE sql VOLATILE STRICT SECURITY DEFINER;
+
+
 
 
 Insert Into dev01.Survey
