@@ -1,5 +1,9 @@
 SET search_path TO dev01,public;
 
+drop function dev01.deleteOutput;
+drop function dev01.InsertValidationOutputByArray;
+drop function dev01.SaveResponseArray;
+
 drop table dev01.ValidationOutput;
 drop table dev01.ValidationParameter;
 drop table dev01.ValidationAttribute;
@@ -285,27 +289,27 @@ Returns dev01.response as $$
     Insert into dev01.response
     (
         reference,
-        period, 
-        survey, 
-        questionCode, 
-        instance, 
-        response, 
-        createdBy, 
+        period,
+        survey,
+        questionCode,
+        instance,
+        response,
+        createdBy,
         createdDate,
         lastUpdatedBy,
         lastUpdatedDate
-    ) 
+    )
     Select  reference,
-            period, 
-            survey, 
-            questionCode, 
-            instance, 
-            response, 
-            createdBy, 
+            period,
+            survey,
+            questionCode,
+            instance,
+            response,
+            createdBy,
             createdDate,
             lastUpdatedBy,
             lastUpdatedDate
-    From    UnNest($1)    
+    From    UnNest($1)
     On Conflict On Constraint response_pkey Do
     Update Set
         response = EXCLUDED.response,
