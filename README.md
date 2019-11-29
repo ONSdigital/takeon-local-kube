@@ -107,6 +107,13 @@ A persistent volume is not being used. All data within the local postgres databa
 * ```alias allpods='kubectl get pods -ntake-on'```
 * ```kubelogs(){ kubectl logs $(kubectl get pods -ntake-on | grep "$1" | awk '{print $1}') -ntake-on}```
 
+* ```alias allpods='kubectl get pods -n$1'```
+* ```alias kubeall='kubectl get all -n$1'```
+* ```kubelogs(){
+```kubectl logs $(kubectl get pods -n$2 | grep "$1" | awk '{print $1}') -n$2}```
+* ```kubeshell(){
+```kubectl exec -it $(kubectl get pods -n$2 | grep "$1" | awk '{print $1}') -n$2 -- /bin/bash}```
+
 kubelogs will look up the appropriate internal pod details and let you view a log by using a unique part of the layer title. i.e.
 
 * ```kubelogs ui```
