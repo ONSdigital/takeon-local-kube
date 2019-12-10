@@ -17,6 +17,7 @@ drop table dev01.Question;
 drop table dev01.Form;
 drop table dev01.Survey;
 
+drop SCHEMA if exists dev01;
 
 CREATE SCHEMA dev01;
 SET search_path TO dev01;

@@ -518,7 +518,7 @@ Insert Into dev01.ValidationForm
     CreatedDate
 )
 Values
-    (10,1,'POPM','0601','0','W',current_user,now())
+    (10,1,'POPM','0601','0','W',current_user,now()),
     (20,1,'POPZC','0602','0','E',current_user,now()),
     (30,1,'VP','0147','0','E',current_user,now()),
     (40,1,'QVDQ','0608','0','W',current_user,now());
@@ -539,7 +539,7 @@ Insert Into dev01.ValidationParameter
 Values
 ( 10, 'Default', 'Default', 'question', '0601', 'response', 0, current_user, now() ),
 ( 10, 'Default', 'Default', 'comparison_question', '0601', 'response', 1, current_user, now() ),
-( 10, 'Default', 'Default', 'threshold', '20000', '', 0, current_user, now() )
+( 10, 'Default', 'Default', 'threshold', '20000', '', 0, current_user, now() ),
 ( 20, 'Default', 'Default', 'question', '0602', 'response', 0, current_user, now() ),
 ( 20, 'Default', 'Default', 'comparison_question', '0602', 'response', 1, current_user, now() ),
 ( 20, 'Default', 'Default', 'threshold', '0', '', 0, current_user, now() ),
