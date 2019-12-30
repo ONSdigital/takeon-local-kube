@@ -1,21 +1,21 @@
 SET search_path TO dev01,public;
 
-drop function dev01.deleteOutput;
-drop function dev01.InsertValidationOutputByArray;
-drop function dev01.SaveResponseArray;
+drop function if exists dev01.deleteOutput;
+drop function if exists dev01.InsertValidationOutputByArray;
+drop function if exists dev01.SaveResponseArray;
 
-drop table dev01.ValidationOutput;
-drop table dev01.ValidationParameter;
-drop table dev01.ValidationAttribute;
-drop table dev01.ValidationForm;
-drop table dev01.ValidationPeriod;
-drop table dev01.ValidationRule;
-drop table dev01.Response;
-drop table dev01.Contributor;
-drop table dev01.FormDefinition;
-drop table dev01.Question;
-drop table dev01.Form;
-drop table dev01.Survey;
+drop table if exists dev01.ValidationOutput;
+drop table if exists dev01.ValidationParameter;
+drop table if exists dev01.ValidationAttribute;
+drop table if exists dev01.ValidationForm;
+drop table if exists dev01.ValidationPeriod;
+drop table if exists dev01.ValidationRule;
+drop table if exists dev01.Response;
+drop table if exists dev01.Contributor;
+drop table if exists dev01.FormDefinition;
+drop table if exists dev01.Question;
+drop table if exists dev01.Form;
+drop table if exists dev01.Survey;
 
 drop SCHEMA if exists dev01;
 
@@ -284,6 +284,7 @@ Returns dev01.validationoutput as $$
     Returning *;
 
 $$ LANGUAGE sql VOLATILE STRICT SECURITY DEFINER;
+
 
 Create Or Replace Function dev01.SaveResponseArray(dev01.response[])
 Returns dev01.response as $$
