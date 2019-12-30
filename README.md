@@ -126,3 +126,4 @@ You can refer to the Common Issues section under 'Linux based systems'. Also the
 |---| --- | --- |
 |If you re start minikube, it can allocate a different ip address to the postgres pod. In that case the persistence layer will no longer be able to connect to postgres | Allocation of different ip address to postgres pod by minikube restart | Follow the steps mentioned above for re run|
 |UI layer not able to access other services | Service account requires cluster-admin role | Along with step 2 above, the command ```kubectl create clusterrolebinding default-admin --clusterrole cluster-admin --serviceaccount=default:default``` can work |
+
