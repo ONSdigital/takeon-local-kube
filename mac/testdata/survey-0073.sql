@@ -110,7 +110,9 @@ Values
     (7340,3,'POPQVQ','0101','0','W',current_user,now()),
     (7341,3,'POPQVQ','0101','0','W',current_user,now()),
 
-    (7350,3,'QVDQ','0608','0','W',current_user,now());
+    (7350,3,'QVDQ','0104','0','W',current_user,now()),
+    (7351,3,'QVDQ','0114','0','W',current_user,now())
+    (7352,3,'QVDQ','0608','0','W',current_user,now());
 
 
 Insert Into dev01.ValidationParameter
