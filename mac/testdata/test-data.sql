@@ -235,6 +235,8 @@ Create Table dev01.ValidationOutput
     CreatedDate         timestamptz Not Null,
     LastUpdatedBy       Varchar(16),
     LastUpdatedDate     timestamptz,
+    overriddenby        Varchar(16),
+    overriddendate      timestamptz,
     Foreign Key (Reference, Period, Survey) References Contributor (Reference, Period, Survey)
 );
 Create Index idx_validationoutput_referenceperiodsurvey On ValidationOutput(Reference, Period, Survey);
