@@ -283,6 +283,25 @@ Returns dev01.validationoutput as $$
 
 $$ LANGUAGE sql VOLATILE STRICT SECURITY DEFINER;
 
+CREATE TYPE dev01.override_validation_output AS (validationoutputid integer,
+                                                 overridden boolean,
+                                                 overriddenby text,
+	                                         overriddendate timestamptz);
+
+CREATE OR REPLACE FUNCTION dev01.update_validationoutput_multi (dev01.override_validation_output[])
+Returns void As $$
+WITH valopinput (validationoutputid, overridden, overriddenby, overriddendate) AS (
+    SELECT *
+	FROM unnest($1)
+)
+UPDATE dev01.validationoutput
+SET overridden = sr.overridden,
+    overriddenby = sr.overriddenby,
+    overriddendate = sr.overriddendate
+FROM valopinput sr
+WHERE dev01.validationoutput.validationoutputid = sr.validationoutputid;
+$$ LANGUAGE sql VOLATILE STRICT SECURITY DEFINER;
+
 Create Or Replace Function dev01.SaveResponseArray(dev01.response[])
 Returns dev01.response as $$
     Insert into dev01.response
