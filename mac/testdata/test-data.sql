@@ -235,6 +235,7 @@ Create Table dev01.ValidationOutput
     CreatedDate         timestamptz Not Null,
     LastUpdatedBy       Varchar(16),
     LastUpdatedDate     timestamptz,
+    overridden          Boolean Not Null,
     overriddenby        Varchar(16),
     overriddendate      timestamptz,
     Foreign Key (Reference, Period, Survey) References Contributor (Reference, Period, Survey)
