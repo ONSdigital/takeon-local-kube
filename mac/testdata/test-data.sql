@@ -13,6 +13,7 @@ drop table dev01.Question;
 drop table dev01.Form;
 drop table dev01.Survey;
 
+drop type dev01.override_validation_output;
 
 CREATE SCHEMA dev01;
 SET search_path TO dev01;
@@ -236,8 +237,6 @@ Create Table dev01.ValidationOutput
     LastUpdatedBy       Varchar(16),
     LastUpdatedDate     timestamptz,
     overridden          Boolean Not Null DEFAULT false,
-    overriddenby        Varchar(16),
-    overriddendate      timestamptz,
     Foreign Key (Reference, Period, Survey) References Contributor (Reference, Period, Survey)
 );
 Create Index idx_validationoutput_referenceperiodsurvey On ValidationOutput(Reference, Period, Survey);
@@ -285,19 +284,19 @@ $$ LANGUAGE sql VOLATILE STRICT SECURITY DEFINER;
 
 CREATE TYPE dev01.override_validation_output AS (validationoutputid integer,
                                                  overridden boolean,
-                                                 overriddenby text,
-	                                         overriddendate timestamptz);
+                                                 lastupdatedby text,
+	                                         lastupdateddate timestamptz);
 
 CREATE OR REPLACE FUNCTION dev01.update_validationoutput_multi (dev01.override_validation_output[])
 Returns void As $$
-WITH valopinput (validationoutputid, overridden, overriddenby, overriddendate) AS (
+WITH valopinput (validationoutputid, overridden, lastupdatedby, lastupdateddate) AS (
     SELECT *
 	FROM unnest($1)
 )
 UPDATE dev01.validationoutput
 SET overridden = sr.overridden,
-    overriddenby = sr.overriddenby,
-    overriddendate = sr.overriddendate
+    lastupdatedby = sr.lastupdatedby,
+    lastupdateddate = sr.lastupdateddate
 FROM valopinput sr
 WHERE dev01.validationoutput.validationoutputid = sr.validationoutputid;
 $$ LANGUAGE sql VOLATILE STRICT SECURITY DEFINER;
