@@ -13,6 +13,7 @@ drop table dev01.Question;
 drop table dev01.Form;
 drop table dev01.Survey;
 
+drop type dev01.override_validation_output;
 
 CREATE SCHEMA dev01;
 SET search_path TO dev01;
@@ -230,11 +231,12 @@ Create Table dev01.ValidationOutput
     ValidationID        BigInt References ValidationForm(ValidationID),
     Instance            BigInt Not Null,
     Formula             Varchar(128) Not Null,
-    Triggered           Boolean Not Null,
+    Triggered           Boolean Not Null DEFAULT false,
     CreatedBy           Varchar(16) Not Null,
     CreatedDate         timestamptz Not Null,
     LastUpdatedBy       Varchar(16),
     LastUpdatedDate     timestamptz,
+    overridden          Boolean Not Null DEFAULT false,
     Foreign Key (Reference, Period, Survey) References Contributor (Reference, Period, Survey)
 );
 Create Index idx_validationoutput_referenceperiodsurvey On ValidationOutput(Reference, Period, Survey);
@@ -278,6 +280,25 @@ Returns dev01.validationoutput as $$
     From    unnest($1)
     Returning *;
 
+$$ LANGUAGE sql VOLATILE STRICT SECURITY DEFINER;
+
+CREATE TYPE dev01.override_validation_output AS (validationoutputid integer,
+                                                 overridden boolean,
+                                                 lastupdatedby text,
+	                                         lastupdateddate timestamptz);
+
+CREATE OR REPLACE FUNCTION dev01.update_validationoutput_multi (dev01.override_validation_output[])
+Returns void As $$
+WITH valopinput (validationoutputid, overridden, lastupdatedby, lastupdateddate) AS (
+    SELECT *
+	FROM unnest($1)
+)
+UPDATE dev01.validationoutput
+SET overridden = sr.overridden,
+    lastupdatedby = sr.lastupdatedby,
+    lastupdateddate = sr.lastupdateddate
+FROM valopinput sr
+WHERE dev01.validationoutput.validationoutputid = sr.validationoutputid;
 $$ LANGUAGE sql VOLATILE STRICT SECURITY DEFINER;
 
 Create Or Replace Function dev01.SaveResponseArray(dev01.response[])
@@ -695,3 +716,12 @@ Values
 ( 41, 'Default', 'Default', 'question', '1000', 'response', 0, current_user, now() ),
 ( 41, 'Default', 'Default', 'comparison_question', '1000', 'response', 1, current_user, now() ),
 ( 41, 'Default', 'Default', 'threshold', '0', '', 0, current_user, now() );
+
+INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (33, '12345678012', '201801', '999A', 10, 0, 'abs(40000 - 10000) > 20000 AND 400000 > 0 AND 10000 > 0', true, 'fisdba', '2020-01-08 11:15:30.347+00', NULL, NULL, false);
+INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (34, '12345678012', '201801', '999A', 20, 0, '1 != 0 AND ( 1 = 1 OR 0 = 0 ) AND abs(1 - 0) > 0', true, 'fisdba', '2020-01-08 11:15:30.347+00', NULL, NULL, false);
+INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (35, '12345678012', '201801', '999A', 40, 0, '1 != 0', true, 'fisdba', '2020-01-08 11:15:30.347+00', NULL, NULL, false);
+INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (36, '12345678012', '201801', '999A', 30, 0, '''0'' != ''''', true, 'fisdba', '2020-01-08 11:15:30.347+00', NULL, NULL, false);
+INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (37, '12345678012', '201801', '999A', 10, 0, 'abs(50000 - 20000) > 20000 AND 50000 > 0 AND 20000 > 0', true, 'fisdba', '2020-01-08 12:04:45.506+00', NULL, NULL, false);
+INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (38, '12345678012', '201801', '999A', 20, 0, '2 != 0 AND ( 2 = 2 OR 0 = 0 ) AND abs(2 - 0) > 0', true, 'fisdba', '2020-01-08 12:04:45.506+00', NULL, NULL, false);
+INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (39, '12345678012', '201801', '999A', 40, 0, '543 != 5143', true, 'fisdba', '2020-01-08 12:04:45.506+00', NULL, NULL, false);
+INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (40, '12345678012', '201801', '999A', 30, 0, '''412'' != ''''', true, 'fisdba', '2020-01-08 12:04:45.506+00', NULL, NULL, false);
