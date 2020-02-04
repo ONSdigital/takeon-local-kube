@@ -93,7 +93,7 @@ A persistent volume is not being used. All data within the local postgres databa
 
 ## Useful commands
 
-* Run an interactive shell session in a pod - ```kubectl exec -it POD-NAME /bin/ash -n take-on```
+* Run an interactive shell session in a pod - ```kubectl exec -it POD-NAME /bin/bash -n take-on```
 * Current runtime status of minikube - ```minikube status```
 * Reset everything - ```minikube delete``` followed by ```minikube start```
 * Access the minikube dashboard - ```minikube dashboard```
