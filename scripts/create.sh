@@ -18,3 +18,4 @@ echo
 wait
 echo
 echo "Complete"
+cp /tmp/minikube_env ~/
