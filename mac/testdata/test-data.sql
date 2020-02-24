@@ -247,52 +247,64 @@ ALTER TABLE dev01.validationoutput
 Create Index idx_validationoutput_referenceperiodsurvey On ValidationOutput(Reference, Period, Survey);
 
 Create Or Replace Function dev01.upsert_delete_validationoutput (dev01.validationoutput[], dev01.validationoutput[])
-Returns dev01.validationoutput as $$
-    
-    DELETE FROM dev01.validationoutput vo
-        USING (SELECT * FROM UnNest($2) ) param
-        WHERE vo.ValidationID = param.ValidationID
-        AND vo.Period = param.Period
-        AND vo.Survey = param.Survey
-        AND vo.ValidationID = param.ValidationID
-        AND vo.Instance = param.Instance;    
-
-    Insert into dev01.validationoutput
-    (   Reference,
-        Period,
-        Survey,
-	ValidationID,
-        Instance,
-        Formula,
-        Triggered,
-        CreatedBy,
-        CreatedDate,
-	LastUpdatedBy,
-	LastUpdatedDate,
-	overridden
-    )
-	SELECT
+Returns text as
+$body$
+BEGIN
+    BEGIN
+	  DELETE FROM dev01.validationoutput vo
+	  USING (SELECT * FROM UnNest($2) ) param
+	  WHERE vo.ValidationID = param.ValidationID
+	  AND vo.Period = param.Period
+	  AND vo.Survey = param.Survey
+	  AND vo.ValidationID = param.ValidationID
+	  AND vo.Instance = param.Instance;
+	EXCEPTION
+	   WHEN OTHERS THEN RETURN 'Error in deleting validationoutput:%',SQLERRM;
+	END;
+	
+	BEGIN
+      Insert into dev01.validationoutput
+      (   Reference,
+          Period,
+          Survey,
+          ValidationID,
+          Instance,
+          Formula,
+          Triggered,
+          CreatedBy,
+          CreatedDate,
+          LastUpdatedBy,
+          LastUpdatedDate,
+          overridden
+      )
+      SELECT
         Reference,
         Period,
         Survey,
-	ValidationID,
+        ValidationID,
         Instance,
         Formula,
         Triggered,
         CreatedBy,
         CreatedDate,
-	LastUpdatedBy,
-	LastUpdatedDate,
-	overridden
-    From    UnNest($1)
-    On Conflict On Constraint validationoutput_ukey Do
-    Update Set
+        (CASE WHEN (LastUpdatedBy = '' OR LastUpdatedBy = 'null')  THEN NULL ELSE LastUpdatedBy END),
+        (CASE WHEN TO_CHAR(LastUpdatedDate, 'DD/MM/YYYY') = '01/01/1900' THEN NULL ELSE LastUpdatedDate END),
+        overridden
+      From    UnNest($1)
+      On Conflict On Constraint validationoutput_ukey Do
+      Update Set
         formula = EXCLUDED.formula,
         overridden = EXCLUDED.overridden,
         lastUpdatedBy = EXCLUDED.lastUpdatedBy,
-        lastUpdatedDate = EXCLUDED.lastUpdatedDate
-    Returning *;
-$$ LANGUAGE sql VOLATILE STRICT SECURITY DEFINER;
+        lastUpdatedDate = EXCLUDED.lastUpdatedDate;
+	  RETURN 'Delete and Upsert has completed in validationoutput';
+	EXCEPTION
+	   WHEN OTHERS THEN RETURN 'Error in upserting validationoutput:%',SQLERRM;
+	END;
+END;
+$body$
+language plpgsql;
+
 
 Create Or Replace Function dev01.deleteOutput(reference text, period text, survey text)
 Returns void As $$
