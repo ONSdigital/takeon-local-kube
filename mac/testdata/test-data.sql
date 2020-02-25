@@ -294,6 +294,7 @@ BEGIN
       On Conflict On Constraint validationoutput_ukey Do
       Update Set
         formula = EXCLUDED.formula,
+        triggered = EXCLUDED.triggered,
         overridden = EXCLUDED.overridden,
         lastUpdatedBy = EXCLUDED.lastUpdatedBy,
         lastUpdatedDate = EXCLUDED.lastUpdatedDate;
