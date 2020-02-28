@@ -239,7 +239,73 @@ Create Table dev01.ValidationOutput
     overridden          Boolean Not Null DEFAULT false,
     Foreign Key (Reference, Period, Survey) References Contributor (Reference, Period, Survey)
 );
+
+ALTER TABLE dev01.validationoutput
+    ADD CONSTRAINT validationoutput_ukey UNIQUE (reference, period, survey, validationid, instance)
+;
+
 Create Index idx_validationoutput_referenceperiodsurvey On ValidationOutput(Reference, Period, Survey);
+
+Create Or Replace Function dev01.upsert_delete_validationoutput (dev01.validationoutput[], dev01.validationoutput[])
+Returns text as
+$body$
+BEGIN
+    BEGIN
+	  DELETE FROM dev01.validationoutput vo
+	  USING (SELECT * FROM UnNest($2) ) param
+	  WHERE vo.ValidationID = param.ValidationID
+	  AND vo.Period = param.Period
+	  AND vo.Survey = param.Survey
+	  AND vo.ValidationID = param.ValidationID
+	  AND vo.Instance = param.Instance;
+	EXCEPTION
+	   WHEN OTHERS THEN RETURN 'Error in deleting validationoutput:%',SQLERRM;
+	END;
+	
+	BEGIN
+      Insert into dev01.validationoutput
+      (   Reference,
+          Period,
+          Survey,
+          ValidationID,
+          Instance,
+          Formula,
+          Triggered,
+          CreatedBy,
+          CreatedDate,
+          LastUpdatedBy,
+          LastUpdatedDate,
+          overridden
+      )
+      SELECT
+        Reference,
+        Period,
+        Survey,
+        ValidationID,
+        Instance,
+        Formula,
+        Triggered,
+        CreatedBy,
+        CreatedDate,
+        LastUpdatedBy,
+        LastUpdatedDate,
+        overridden
+      From    UnNest($1)
+      On Conflict On Constraint validationoutput_ukey Do
+      Update Set
+        formula = EXCLUDED.formula,
+        triggered = EXCLUDED.triggered,
+        overridden = EXCLUDED.overridden,
+        lastUpdatedBy = EXCLUDED.lastUpdatedBy,
+        lastUpdatedDate = EXCLUDED.lastUpdatedDate;
+	  RETURN 'Delete and Upsert has completed in validationoutput';
+	EXCEPTION
+	   WHEN OTHERS THEN RETURN 'Error in upserting validationoutput:%',SQLERRM;
+	END;
+END;
+$body$
+language plpgsql;
+
 
 Create Or Replace Function dev01.deleteOutput(reference text, period text, survey text)
 Returns void As $$
@@ -717,10 +783,10 @@ Values
 ( 41, 'Default', 'Default', 'comparison_question', '1000', 'response', 1, current_user, now() ),
 ( 41, 'Default', 'Default', 'threshold', '0', '', 0, current_user, now() );
 
-INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (33, '12345678012', '201801', '999A', 10, 0, 'abs(40000 - 10000) > 20000 AND 400000 > 0 AND 10000 > 0', true, 'fisdba', '2020-01-08 11:15:30.347+00', NULL, NULL, false);
-INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (34, '12345678012', '201801', '999A', 20, 0, '1 != 0 AND ( 1 = 1 OR 0 = 0 ) AND abs(1 - 0) > 0', true, 'fisdba', '2020-01-08 11:15:30.347+00', NULL, NULL, false);
-INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (35, '12345678012', '201801', '999A', 40, 0, '1 != 0', true, 'fisdba', '2020-01-08 11:15:30.347+00', NULL, NULL, false);
-INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (36, '12345678012', '201801', '999A', 30, 0, '''0'' != ''''', true, 'fisdba', '2020-01-08 11:15:30.347+00', NULL, NULL, false);
+INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (33, '12345678012', '201712', '999A', 10, 0, 'abs(40000 - 10000) > 20000 AND 400000 > 0 AND 10000 > 0', true, 'fisdba', '2020-01-08 11:15:30.347+00', NULL, NULL, false);
+INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (34, '12345678012', '201712', '999A', 20, 0, '1 != 0 AND ( 1 = 1 OR 0 = 0 ) AND abs(1 - 0) > 0', true, 'fisdba', '2020-01-08 11:15:30.347+00', NULL, NULL, false);
+INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (35, '12345678012', '201712', '999A', 40, 0, '1 != 0', true, 'fisdba', '2020-01-08 11:15:30.347+00', NULL, NULL, false);
+INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (36, '12345678012', '201712', '999A', 30, 0, '''0'' != ''''', true, 'fisdba', '2020-01-08 11:15:30.347+00', NULL, NULL, false);
 INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (37, '12345678012', '201801', '999A', 10, 0, 'abs(50000 - 20000) > 20000 AND 50000 > 0 AND 20000 > 0', true, 'fisdba', '2020-01-08 12:04:45.506+00', NULL, NULL, false);
 INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (38, '12345678012', '201801', '999A', 20, 0, '2 != 0 AND ( 2 = 2 OR 0 = 0 ) AND abs(2 - 0) > 0', true, 'fisdba', '2020-01-08 12:04:45.506+00', NULL, NULL, false);
 INSERT INTO dev01.validationoutput (ValidationOutputID, Reference, Period, Survey, ValidationID, Instance, Formula, Triggered, CreatedBy, CreatedDate, LastUpdatedBy, LastUpdatedDate, overridden) VALUES (39, '12345678012', '201801', '999A', 40, 0, '543 != 5143', true, 'fisdba', '2020-01-08 12:04:45.506+00', NULL, NULL, false);
