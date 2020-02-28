@@ -39,8 +39,8 @@ echo DBNAME: ${DB_name}
 echo DB_SERVER_IP: ${DB_SERVER_IP}
 
 log "Copying & running test data into container"
-kubectl cp ../mac/testdata/test-script.sql ${namespace}/${POSTGRES_POD}:/tmp
-kubectl exec -it -n ${namespace} ${POSTGRES_POD} -- psql -d ${DB_name} -U ${DB_USERNAME} -p 5432 -f "/tmp/test-script.sql"
+kubectl cp ../mac/testdata/test-data.sql ${namespace}/${POSTGRES_POD}:/tmp
+kubectl exec -it -n ${namespace} ${POSTGRES_POD} -- psql -d ${DB_name} -U ${DB_USERNAME} -p 5432 -f "/tmp/test-data.sql"
 
 log "Adding DB server settings to /tmp/minikub_env"
 echo kubectl exec -it -n takeon ${POSTGRES_POD} -- psql -d ${DB_name} -U ${DB_USERNAME} -p 5432
