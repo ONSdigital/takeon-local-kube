@@ -598,18 +598,6 @@ Values
     ( '12345678034','201801','999A','1000',0,'',current_user,now()),
     ( '12345678034','201801','999A','1001',0,'',current_user,now());
 
-
-Create table dev01.ValidationRule
-(
-     Rule            Varchar(16) Primary Key,
-     Name            Varchar(32) Not Null,
-     BaseFormula     Varchar(1024) Not Null,
-     CreatedBy       Varchar(16) Not Null,
-     CreatedDate     timestamptz Not Null,
-     LastUpdatedBy   Varchar(16),
-     LastUpdatedDate timestamptz
- );
-
 Insert Into dev01.ValidationRule
 (
     Rule,
