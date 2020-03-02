@@ -157,6 +157,7 @@ Create Table dev01.ValidationRule
 (
     Rule            Varchar(16) Primary Key,
     Name            Varchar(32) Not Null,
+    ValidationMessage Varchar(256),
     BaseFormula     Varchar(1024) Not Null,
     CreatedBy       Varchar(16) Not Null,
     CreatedDate     timestamptz Not Null,
@@ -663,33 +664,22 @@ Values
     ( '12345678034','201801','999A','1000',0,'',current_user,now()),
     ( '12345678034','201801','999A','1001',0,'',current_user,now());
 
-
--- Create table dev01.ValidationRule
--- (
---     Rule            Varchar(16) Primary Key,
---     Name            Varchar(32) Not Null,
---     BaseFormula     Varchar(1024) Not Null,
---     CreatedBy       Varchar(16) Not Null,
---     CreatedDate     timestamptz Not Null,
---     LastUpdatedBy   Varchar(16),
---     LastUpdatedDate timestamptz
--- );
-
 Insert Into dev01.ValidationRule
 (
     Rule,
     Name,
+    ValidationMessage,
     BaseFormula,
     CreatedBy,
     CreatedDate
 )
 Values
-( 'VP','Value Present','"question" != ""',current_user,now()),
-( 'POPM','Period on Period Movement','abs(question - comparison_question) > threshold AND question > 0 AND comparison_question > 0',current_user,now()),
-( 'POPZC','Period on Period Zero Continuity','question != comparison_question AND ( question = 0 OR comparison_question = 0 ) AND abs(question - comparison_question) > threshold',current_user,now()),
-( 'QVDQ','Question vs Derived Question','question != comparison_question',current_user,now());
-
-
+( 'VP','Value Present','Respondent entered a value','"question" != ""',current_user,now()),
+( 'POPM','Period on Period Movement','This has changed significantly since the last submission','abs(question - comparison_question) > threshold AND question > 0 AND comparison_question > 0',current_user,now()),
+( 'POPZC','Period on Period Zero Continuity','This is different to the previous submission. If this is 0 or blank, the previous was greater. If this has a value, the previous was 0 or blank','question != comparison_question AND ( question = 0 OR comparison_question = 0 ) AND abs(question - comparison_question) > threshold',current_user,now()),
+( 'POPQVQ','Period on Period Q Vs Q','This has changed significantly since the last submission and this is greater than the question we compare it to','question != comparison_question',current_user,now()),
+( 'QVDQ','Question vs Derived Question','This total is not equal to the derived total','question != comparison_question',current_user,now()),
+( 'CPBMI', 'Comment Present (BMI)','Respondent entered a comment', 'question = 2', current_user,now());
 
 
 
