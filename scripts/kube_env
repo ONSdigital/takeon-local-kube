@@ -1,4 +1,4 @@
-export basedir=~/repo
+export basedir=/Users/siva/projects
 export logdir=${basedir}/takeon-local-kube/logs
 
 export namespace=take-on
@@ -10,6 +10,7 @@ export DB_name=takeondb
 
 export QL_service=graphql
 export QL_image=graphql
+export QL_repo=${basedir}/takeon-graphql
 
 export PL_repo=${basedir}/takeon-persistence-layer
 export PL_image=takeon-dev-pl

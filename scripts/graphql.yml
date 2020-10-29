@@ -19,7 +19,7 @@ spec:
       containers:
       - name: ${QL_service}
         image: ${QL_image}
-        imagePullPolicy: Never
-        args: ['--connection', 'postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_SERVER_IP}/${DB_name}', '--schema', 'dev01', '-j', '-a', '--watch']
+        imagePullPolicy: Never        
+        args: ['--connection', 'postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_SERVER_IP}/${DB_name}', '--schema', 'dev01', '-j', '-a', '--watch', '--append-plugins', 'postgraphile-plugin-connection-filter']
         ports:
         - containerPort: 5000

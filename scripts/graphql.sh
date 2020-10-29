@@ -12,8 +12,10 @@ delete_deployment ${namespace} ${QL_image}
 delete_service ${namespace} ${QL_image}
 
 log "Get postgraphile dockerfile"
-docker pull graphile/postgraphile 
-docker tag graphile/postgraphile ${QL_image}
+#docker pull graphile/postgraphile 
+#docker tag graphile/postgraphile ${QL_image}
+log "Building ${QL_image} from ${QL_repo}"
+docker build -t ${QL_image} ${QL_repo}
 
 log "Deploying graphql"
 apply graphql.yml
